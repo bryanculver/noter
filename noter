@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# noter: An tiny little bash script to take notes into a file.
+# Copyright (C) 2015  Bryan Culver
+#
+#     This program is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# If you have any questions, please contact me at: me@bryanculver.com
+
+if [ ! -f ~/.noter ]
+then
+	touch ~/.noter
+fi
+if [[ $1 =~ ^\,.*$ ]]
+then
+	# Is a command, executing functions
+  CMND=$(echo "$1" | sed 's/\,\([^ ]*\).*/\1/')
+	if [[ $CMND =~ ^list$ ]]
+	then
+    echo "== Name:Path List =="
+		cat ~/.noter
+	elif [[ $CMND =~ ^add$ ]]
+	then
+		echo "$2:$3" >> ~/.noter
+  elif [[ $CMND =~ ^del$ ]]
+  then
+    sed "/^$2:/d" ~/.noter > ~/.noter
+	fi
+elif [[ $1 =~ ^\..*$ ]]
+then
+	FILESC=$(echo "$1" | sed 's/\.\([^ ]*\).*/\1/')
+	LISTMATCH=$(grep "^$FILESC:" ~/.noter)
+	if [ ! ${#LISTMATCH} -eq 0 ]
+  then
+    FPATH=$(echo "$LISTMATCH" | sed 's/.*:\(.*\)/\1/')
+    shift
+    echo $* >> $FPATH
+  else
+    echo "That name was not understood."
+  fi
+
+else
+	echo "I didn't catch what you wanted..."
+fi
