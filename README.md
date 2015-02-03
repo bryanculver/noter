@@ -30,6 +30,18 @@ To use, download the script and add it to any path your PATH can find. To make i
 
 `$ noter ,list`
 
+### ADDING EDITOR
+
+`$ noter ,editl <editor name or path to editor>`
+
+*Example:*
+
+`$ noter ,editl vim`
+
+### RECALLING EDITOR
+
+`$ noter ,editr`
+
 
 
 ### ADDING NOTE
@@ -39,3 +51,11 @@ To use, download the script and add it to any path your PATH can find. To make i
 *Example:*
 
 `$ noter .work This is just a note.`
+
+### EDITING A NOTE
+
+`$ noter ,edit .<name>`
+
+*Example:*
+
+`$ noter ,edit .work`

@@ -17,10 +17,14 @@
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # If you have any questions, please contact me at: me@bryanculver.com
-
+EDITOR_SET=false
 if [ ! -f ~/.noter ]
 then
 	touch ~/.noter
+fi
+if [ -f ~/.noteredit ]
+then
+  EDITOR_SET=true
 fi
 if [[ $1 =~ ^\,.*$ ]]
 then
@@ -33,22 +37,46 @@ then
 	elif [[ $CMND =~ ^add$ ]]
 	then
 		echo "$2:$3" >> ~/.noter
-  elif [[ $CMND =~ ^del$ ]]
-  then
-    sed "/^$2:/d" ~/.noter > ~/.noter
+  	elif [[ $CMND =~ ^del$ ]]
+  	then
+    	sed "/^$2:/d" ~/.noter > ~/.noter
+    elif [[ $CMND =~ ^editl$ ]]
+    then
+      rm ~/.noteredit > /dev/null
+    	ln -s $(which $2)  ~/.noteredit
+    	chmod +x ~/.noteredit
+    elif [[ $CMND =~ ^editr$ ]]
+    then
+      readlink ~/.noteredit
+    elif [[ $CMND =~ ^edit$ ]]
+    then
+      if [[ $EDITOR_SET == true ]]
+      then
+        FILESC=$(echo "$2" | sed 's/\.\([^ ]*\).*/\1/')
+        LISTMATCH=$(grep "^$FILESC:" ~/.noter)
+        if [ ! ${#LISTMATCH} -eq 0 ]
+        then
+          FPATH=$(echo "$LISTMATCH" | sed 's/.*:\(.*\)/\1/')
+          ~/.noteredit $FPATH
+        else
+         echo "That name was not understood."
+        fi
+      else
+        echo "No default editor set. Please use ,editl to set."
+      fi
 	fi
 elif [[ $1 =~ ^\..*$ ]]
 then
 	FILESC=$(echo "$1" | sed 's/\.\([^ ]*\).*/\1/')
 	LISTMATCH=$(grep "^$FILESC:" ~/.noter)
 	if [ ! ${#LISTMATCH} -eq 0 ]
-  then
-    FPATH=$(echo "$LISTMATCH" | sed 's/.*:\(.*\)/\1/')
-    shift
-    echo $* >> $FPATH
-  else
-    echo "That name was not understood."
-  fi
+	then
+		FPATH=$(echo "$LISTMATCH" | sed 's/.*:\(.*\)/\1/')
+		shift
+		echo $* >> $FPATH
+	else
+	 echo "That name was not understood."
+	fi
 
 else
 	echo "I didn't catch what you wanted..."
